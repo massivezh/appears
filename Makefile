@@ -29,4 +29,7 @@ test: all
 	-./appears1 samples/good1.txt
 	@echo ===========================
 	-./appears1 samples/good2.txt
-
+clean: 
+	rm -f *.o
+	rm -f appears appears1 appears2
+	rm -f t/gensample
