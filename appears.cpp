@@ -18,19 +18,21 @@
 #endif
 
 /* 4^APPEARS_SEQSIZE */
-const size_t TABLESIZE = 1L << (2 * APPEARS_SEQSIZE);
+const unsigned int SP_TB_NUM = 490000000;
+const unsigned int CMP_TB_NUM = 490000000;
 
+const size_t TABLESIZE = 1L << (2 * APPEARS_SEQSIZE);
 /* We make this naming convention that a "token" is a nucleotide */
 const int BITS_PER_TOKEN = 2;
-const int TOKEN_MASK = 3; /* "11" in binary */
 
-typedef std::bitset<APPEARS_SEQSIZE * BITS_PER_TOKEN> index_t;
+unsigned int *Table_SP =new unsigned int [SP_TB_NUM];
+unsigned int *Table_CMP =new unsigned int [CMP_TB_NUM];
 
 enum {
     G = 0, A, T, C
 };
 
-std::bitset<TABLESIZE> BitTable;
+
 
 /* forward declarations */
 static bool parse_seq_file (const char* fname);
@@ -39,24 +41,19 @@ static void index_to_tokens (unsigned long index, char* buf);
 
 int
 main (int argc, char* argv[]) {
-    const char* fname;
+    const char* fname_b;
+    const char* fname_s;
     if (argc < 2) {
         fprintf(stderr, "ERROR: No input file specified.\n");
         return 1;
     }
-    fname = argv[1];
+    fname_b = argv[1];
+    fprintf(stderr, "INFO: Reading file %s...\n", fname_b);
 
-    fprintf(stderr, "INFO: Reading file %s...\n", fname);
-
-    if ( ! parse_seq_file(fname) ) {
+    if ( ! parse_seq_file(fname_b) ) {
         return 1;
     }
 
-    fprintf(stderr,
-            "INFO: Using a bit array of length %lu"
-            " (sequence length: %ld).\n",
-            (unsigned long)TABLESIZE,
-            APPEARS_SEQSIZE);
 
     fprintf(stderr,
             "INFO: Searching missing combinations of sequences...\n");
@@ -66,13 +63,14 @@ main (int argc, char* argv[]) {
 }
 
 /* parse_seq_file: read in the sequence stream and set
- * the global BitTable variable accordingly. */
+ * the global BitTable_b variable accordingly. */
 bool
 parse_seq_file (const char* fname) {
     FILE* infile;
     char c;
     unsigned long lineno = 1L;
-    index_t index;
+    unsigned long num = 0;
+    unsigned long index;
     unsigned long tokens_seen = 0L;
 
     if (NULL == (infile = fopen(fname, "r"))) {
@@ -100,10 +98,6 @@ parse_seq_file (const char* fname) {
         switch (c) {
             case '\n':
                 lineno++;
-            case ' ':
-            case '\t':
-            case '\r':
-                /* ignored spaces */
                 break;
             case 'G':
                 index <<= BITS_PER_TOKEN;
@@ -126,10 +120,7 @@ parse_seq_file (const char* fname) {
                 found_token = true;
                 break;
             default:
-                fprintf(stderr, "ERROR: File %s: line %lu: "
-                        "Invalid character found: '%c' (0x%x)\n",
-                        fname, lineno, c, c);
-                return false;
+                found_token = false;
                 break;
         }
         if (found_token) {
@@ -138,9 +129,9 @@ parse_seq_file (const char* fname) {
             }
             if (tokens_seen >= APPEARS_SEQSIZE) {
                 /* register this subsequence combination */
-                unsigned long index_ulong = index.to_ulong();
-                DD("setting the %luth bit", index_ulong);
-                BitTable.set(index_ulong, 1);
+                Table_SP[num]=index;
+		num++;
+		tokens_seen=0L;
             }
         }
     }
@@ -151,10 +142,10 @@ parse_seq_file (const char* fname) {
 /* index_to_tokens: decode the binary index numerals to G/A/T/C
  * token sequences */
 void
-index_to_tokens (unsigned long index, char* buf) {
-    for (unsigned long i = 0; i < APPEARS_SEQSIZE; i++) {
+index_to_tokens (unsigned int index, char* buf) {
+    for (unsigned int i = 0; i < APPEARS_SEQSIZE; i++) {
         int encoded_token =
-            (index >> (i * BITS_PER_TOKEN)) & TOKEN_MASK;
+            (index >> (i * BITS_PER_TOKEN)) & 3L;
         switch (encoded_token) {
             case G:
                 buf[APPEARS_SEQSIZE - i - 1] = 'G';
@@ -173,27 +164,35 @@ index_to_tokens (unsigned long index, char* buf) {
         }
     }
     buf[APPEARS_SEQSIZE] = '\0';
+
 }
 
-/* search_missing_combinations: traverse the BitTable
+/* search_missing_combinations: traverse the BitTable_b
  * to find 0 bits and print out the corresponding
  * character sequences */
 void
 search_missing_combinations () {
-    unsigned long missing_combs = 0;
-    char buf[APPEARS_SEQSIZE + 1];
-    for (unsigned long i = 0; i < TABLESIZE; i++) {
-        if (!BitTable.test(i)) {
-            index_to_tokens(i, buf);
-            printf("  %s (index %lu)\n", buf, i);
-            missing_combs++;
-        }
-    }
-    if (missing_combs) {
-        printf("For total %lu missing combinations found.\n",
-                missing_combs);
-    } else {
-        printf("All combinations have appeared.\n");
-    }
+char buf[APPEARS_SEQSIZE+1 ];
+unsigned int cmp;
+long i,j;
+int k;
+/*
+for (i=0;i<49;i++){
+cmp=CMP_TB_NUM[i];
+	for (j=0;j<49;j++){
+		for(k=0;k<4;k++){
+			cmp&Table_SP[j];
+			cmp<<1L;
+		}
+	}
 }
+
+
+	index_to_tokens (Table[i], buf);
+	printf("%s:%ld\n",buf,i);
+}
+*/
+
+}
+
 

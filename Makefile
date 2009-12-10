@@ -12,6 +12,10 @@ appears1: appears.cpp
 	#rm -f *.o
 	g++ -D 'APPEARS_SEQSIZE=1L' -O2 -Wall -Wno-unused-value -g $< -o $@
 
+app: appears.cpp
+	#rm -f *.o
+	g++ -Wall -g $< -o $@
+
 appears appears2: ddebug.h
 
 t/gensample: t/gensample.c

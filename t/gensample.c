@@ -6,7 +6,7 @@ static char tokens[] = {'G', 'A', 'T', 'C'};
 
 int main (int argc, char* argv[]) {
     float size_in_giga = 0;
-    size_t size, i;
+    size_t size, i,j;
     int index;
 
     if (argc >= 2) {
@@ -21,11 +21,14 @@ int main (int argc, char* argv[]) {
     }
     size = size_in_giga * (1024 * 1024 * 1024);
 
-    for (i = 0; i < size; i++) {
-        index = rand() % sizeof(tokens);
-        putc(tokens[index], stdout);
+    for (i = 0; i < 49; i++) {
+	for (j=0;j<15;j++){
+	        	index = rand() % sizeof(tokens);
+        		putc(tokens[index], stdout);
+			
+	}
+			printf(":%d\n",i);			
     }
 
     return 0;
 }
-
