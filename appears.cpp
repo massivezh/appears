@@ -177,6 +177,7 @@ unsigned int cmp;
 long i,j;
 int k;
 /*
+ * to be continued ...
 for (i=0;i<49;i++){
 cmp=CMP_TB_NUM[i];
 	for (j=0;j<49;j++){
