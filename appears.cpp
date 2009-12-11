@@ -16,10 +16,11 @@
 #ifndef APPEARS_SEQSIZE
 #define APPEARS_SEQSIZE 15L /* sequence string size */
 #endif
-
 /* 4^APPEARS_SEQSIZE */
 const unsigned int SP_TB_NUM = 490000000;
 const unsigned int CMP_TB_NUM = 490000000;
+
+const unsigned int masks[4]={0xfff,0xfff*2,0xfff*3,0xfff*4};
 
 const size_t TABLESIZE = 1L << (2 * APPEARS_SEQSIZE);
 /* We make this naming convention that a "token" is a nucleotide */
@@ -58,12 +59,17 @@ main (int argc, char* argv[]) {
     fprintf(stderr,
             "INFO: Searching missing combinations of sequences...\n");
     search_missing_combinations();
-
-    return 0;
+for(int i=0;i<4;i++){
+printf("%x\n",masks[i]);
+}    
+return 0;
 }
 
 /* parse_seq_file: read in the sequence stream and set
- * the global BitTable_b variable accordingly. */
+ * the global BitTable_b variable accordingly.
+ *这里输入加入一个枚举变量，区别不同表。
+ *
+ * */
 bool
 parse_seq_file (const char* fname) {
     FILE* infile;
@@ -176,24 +182,42 @@ char buf[APPEARS_SEQSIZE+1 ];
 unsigned int cmp;
 long i,j;
 int k;
-/*
- * to be continued ...
+unsigned int sp[4];
+
+
 for (i=0;i<49;i++){
-cmp=CMP_TB_NUM[i];
-	for (j=0;j<49;j++){
-		for(k=0;k<4;k++){
-			cmp&Table_SP[j];
-			cmp<<1L;
+sp[0]=(Table_SP[i]<<1) & masks[0];
+sp[1]=(Table_SP[i]<<2) & masks[1];
+sp[2]=(Table_SP[i]<<3) & masks[2];
+sp[3]=(Table_SP[i]<<4) & masks[3];
+	for (j=0;j<1;j++){
+		if(sp[0]==Table_CMP[j]);{
+			index_to_tokens (Table_CMP[i], buf);
+			printf("%s:%ld\n",buf,i);
+			contiune;
+		}
+		if(sp[1]==Table_CMP[j]);{
+			index_to_tokens (Table_CMP[i], buf);
+			printf("%s:%ld\n",buf,i);
+			contiune;
+		}
+		if(sp[2]==Table_CMP[j]);{
+			index_to_tokens (Table_CMP[i], buf);
+			printf("%s:%ld\n",buf,i);
+			contiune;
+		}
+		if(sp[3]==Table_CMP[j]);{
+			index_to_tokens (Table_CMP[i], buf);
+			printf("%s:%ld\n",buf,i);
+			contiune;
 		}
 	}
 }
 
 
-	index_to_tokens (Table[i], buf);
-	printf("%s:%ld\n",buf,i);
-}
-*/
 
-}
+
+
+
 
 
