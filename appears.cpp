@@ -45,8 +45,8 @@ static void index_to_tokens (uint32_t index, char* buf);
 static void d_print(uint32_t index, char* buf);
 int
 main (int argc, char* argv[]) {
-    const char* fname_sp;
-    const char* fname_cmp;
+    const char* fname_sp; //15bp file
+    const char* fname_cmp;//12bp file
     if (argc < 2) {
         fprintf(stderr, "ERROR: No input file specified.\n");
         return 1;
